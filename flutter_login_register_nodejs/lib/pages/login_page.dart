@@ -164,8 +164,67 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
+
+          const SizedBox(height: 20),
+          Center(
+            child: FormHelper.submitButton(
+              "Login",
+              () {},
+              btnColor: HexColor("283B71"),
+              borderColor: Colors.white,
+              txtColor: Colors.white,
+              borderRadius: 10,
+            ),
+          ),
+          const SizedBox(height: 20),
+          const Center(
+            child: Text(
+              "OR",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Align(
+            alignment: Alignment.center,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 25),
+              child: RichText(
+                text: TextSpan(
+                  style: const TextStyle(color: Colors.white, fontSize: 14.0),
+                  children: <TextSpan>[
+                    const TextSpan(text: 'Dont have an account? '),
+                    TextSpan(
+                      text: 'Sign up',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      recognizer:
+                          TapGestureRecognizer()
+                            ..onTap = () {
+                              Navigator.pushNamed(context, '/register');
+                            },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  bool validateAndSave() {
+    final form = globalFormKey.currentState;
+    if (form!.validate()) {
+      form.save();
+      return true;
+    }
+    return false;
   }
 }
