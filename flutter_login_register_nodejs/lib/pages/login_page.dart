@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           Container(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
+            height: MediaQuery.of(context).size.height * 0.4,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -52,6 +52,18 @@ class _LoginPageState extends State<LoginPage> {
                 bottomRight: Radius.circular(100),
                 bottomLeft: Radius.circular(100),
               ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.center,
+                  child: Image.asset(
+                    "assets/images/ShoppingAppLogo.png",
+                    height: 100,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
