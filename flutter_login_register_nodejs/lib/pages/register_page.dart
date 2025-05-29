@@ -32,5 +32,43 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _registerUI(BuildContext context) {}
+  Widget _registerUI(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height / 5.2,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.white,
+                  Colors.white,
+                ],
+              ),
+              borderRadius: BorderRadius.only(
+                bottomRight: Radius.circular(100),
+                bottomLeft: Radius.circular(100),
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.center,
+                  child: Image.asset(
+                    "assets/images/ShoppingAppLogo.png",
+                    fit: BoxFit.contain,
+                    width: 250,
+                  ),
+                ),
+              ],
+            ),
+          ),
+    );
+  }
 }
