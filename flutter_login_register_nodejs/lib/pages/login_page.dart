@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:snippet_coder_utils/FormHelper.dart';
 import 'package:snippet_coder_utils/ProgressHUD.dart';
@@ -137,6 +138,28 @@ class _LoginPageState extends State<LoginPage> {
                 color: Colors.white.withOpacity(0.7),
                 icon: Icon(
                   hidePassword ? Icons.visibility_off : Icons.visibility,
+                ),
+              ),
+            ),
+          ),
+
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 25),
+              child: RichText(
+                text: TextSpan(
+                  style: const TextStyle(color: Colors.grey, fontSize: 14.0),
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: 'Forget Password ?',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer: TapGestureRecognizer()..onTap = () {},
+                    ),
+                  ],
                 ),
               ),
             ),
