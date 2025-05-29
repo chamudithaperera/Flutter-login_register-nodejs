@@ -5,7 +5,7 @@ import 'package:snippet_coder_utils/ProgressHUD.dart';
 import 'package:snippet_coder_utils/hex_color.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({super.key}); // fixed suggestion: use super parameter
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -38,10 +38,10 @@ class _LoginPageState extends State<LoginPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        children: <Widget>[
           Container(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * 0.4,
+            height: MediaQuery.of(context).size.height / 5.2,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -49,20 +49,19 @@ class _LoginPageState extends State<LoginPage> {
                 colors: [Colors.white, Colors.white],
               ),
               borderRadius: BorderRadius.only(
-                //topLeft: Radius.circular(100),
-                //topRight: Radius.circular(150),
                 bottomRight: Radius.circular(100),
                 bottomLeft: Radius.circular(100),
               ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+              children: <Widget>[
                 Align(
                   alignment: Alignment.center,
                   child: Image.asset(
                     "assets/images/ShoppingAppLogo.png",
-                    height: 100,
+                    fit: BoxFit.contain,
+                    width: 250,
                   ),
                 ),
               ],
@@ -85,19 +84,17 @@ class _LoginPageState extends State<LoginPage> {
               context,
               "Username",
               "Username",
-              (onValidateVal) {
-                if (onValidateVal.isEmpty) {
+              (val) {
+                if (val.isEmpty) {
                   return 'Username can\'t be empty.';
                 }
                 return null;
               },
-              (onSavedVal) {
-                userName = onSavedVal;
-              },
-              prefixIcon: const Icon(Icons.person),
+              (val) => userName = val,
               initialValue: "",
               obscureText: false,
               borderFocusColor: Colors.white,
+              prefixIcon: const Icon(Icons.person),
               prefixIconColor: Colors.white,
               borderColor: Colors.white,
               textColor: Colors.white,
@@ -111,19 +108,17 @@ class _LoginPageState extends State<LoginPage> {
               context,
               "Password",
               "Password",
-              (onValidateVal) {
-                if (onValidateVal.isEmpty) {
+              (val) {
+                if (val.isEmpty) {
                   return 'Password can\'t be empty.';
                 }
                 return null;
               },
-              (onSavedVal) {
-                password = onSavedVal;
-              },
-              prefixIcon: const Icon(Icons.lock),
+              (val) => password = val,
               initialValue: "",
               obscureText: hidePassword,
               borderFocusColor: Colors.white,
+              prefixIcon: const Icon(Icons.lock),
               prefixIconColor: Colors.white,
               borderColor: Colors.white,
               textColor: Colors.white,
@@ -142,7 +137,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-
           Align(
             alignment: Alignment.bottomRight,
             child: Padding(
@@ -157,19 +151,28 @@ class _LoginPageState extends State<LoginPage> {
                         color: Colors.white,
                         decoration: TextDecoration.underline,
                       ),
-                      recognizer: TapGestureRecognizer()..onTap = () {},
+                      recognizer:
+                          TapGestureRecognizer()
+                            ..onTap = () {
+                              // Add your forget password logic here
+                            },
                     ),
                   ],
                 ),
               ),
             ),
           ),
-
           const SizedBox(height: 20),
           Center(
             child: FormHelper.submitButton(
               "Login",
-              () {},
+              () {
+                if (validateAndSave()) {
+                  // Call your login logic here
+                  print("Username: $userName");
+                  print("Password: $password");
+                }
+              },
               btnColor: HexColor("283B71"),
               borderColor: Colors.white,
               txtColor: Colors.white,
@@ -196,7 +199,7 @@ class _LoginPageState extends State<LoginPage> {
                 text: TextSpan(
                   style: const TextStyle(color: Colors.white, fontSize: 14.0),
                   children: <TextSpan>[
-                    const TextSpan(text: 'Dont have an account? '),
+                    const TextSpan(text: 'Don\'t have an account? '),
                     TextSpan(
                       text: 'Sign up',
                       style: const TextStyle(
@@ -214,6 +217,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -221,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
 
   bool validateAndSave() {
     final form = globalFormKey.currentState;
-    if (form!.validate()) {
+    if (form != null && form.validate()) {
       form.save();
       return true;
     }

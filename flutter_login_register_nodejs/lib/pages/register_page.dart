@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:snippet_coder_utils/FormHelper.dart';
 import 'package:snippet_coder_utils/ProgressHUD.dart';
 import 'package:snippet_coder_utils/hex_color.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+  const RegisterPage({Key? key}) : super(key: key);
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
 class _RegisterPageState extends State<RegisterPage> {
@@ -16,6 +17,11 @@ class _RegisterPageState extends State<RegisterPage> {
   String? userName;
   String? password;
   String? email;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,10 +51,7 @@ class _RegisterPageState extends State<RegisterPage> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Colors.white,
-                  Colors.white,
-                ],
+                colors: [Colors.white, Colors.white],
               ),
               borderRadius: BorderRadius.only(
                 bottomRight: Radius.circular(100),
@@ -69,6 +72,122 @@ class _RegisterPageState extends State<RegisterPage> {
               ],
             ),
           ),
+          const Padding(
+            padding: EdgeInsets.only(left: 20, bottom: 30, top: 50),
+            child: Text(
+              "Register",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 25,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: FormHelper.inputFieldWidget(
+              context,
+              "Username",
+              "Username",
+              (onValidateVal) {
+                if (onValidateVal.isEmpty) {
+                  return 'Username can\'t be empty.';
+                }
+
+                return null;
+              },
+              (onSavedVal) => {userName = onSavedVal},
+              initialValue: "",
+              obscureText: false,
+              borderFocusColor: Colors.white,
+              prefixIconColor: Colors.white,
+              borderColor: Colors.white,
+              textColor: Colors.white,
+              hintColor: Colors.white.withOpacity(0.7),
+              borderRadius: 10,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: FormHelper.inputFieldWidget(
+              context,
+              "Password",
+              "Password",
+              (onValidateVal) {
+                if (onValidateVal.isEmpty) {
+                  return 'Password can\'t be empty.';
+                }
+
+                return null;
+              },
+              (onSavedVal) => {password = onSavedVal},
+              initialValue: "",
+              obscureText: hidePassword,
+              borderFocusColor: Colors.white,
+              prefixIconColor: Colors.white,
+              borderColor: Colors.white,
+              textColor: Colors.white,
+              hintColor: Colors.white.withOpacity(0.7),
+              borderRadius: 10,
+              suffixIcon: IconButton(
+                onPressed: () {
+                  setState(() {
+                    hidePassword = !hidePassword;
+                  });
+                },
+                color: Colors.white.withOpacity(0.7),
+                icon: Icon(
+                  hidePassword ? Icons.visibility_off : Icons.visibility,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: FormHelper.inputFieldWidget(
+              context,
+              "Email",
+              "Email",
+              (onValidateVal) {
+                if (onValidateVal.isEmpty) {
+                  return 'Email can\'t be empty.';
+                }
+
+                return null;
+              },
+              (onSavedVal) => {email = onSavedVal},
+              initialValue: "",
+              borderFocusColor: Colors.white,
+              prefixIconColor: Colors.white,
+              borderColor: Colors.white,
+              textColor: Colors.white,
+              hintColor: Colors.white.withOpacity(0.7),
+              borderRadius: 10,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Center(
+            child: FormHelper.submitButton(
+              "Register",
+              () {},
+              btnColor: HexColor("283B71"),
+              borderColor: Colors.white,
+              txtColor: Colors.white,
+              borderRadius: 10,
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
     );
+  }
+
+  bool validateAndSave() {
+    final form = globalFormKey.currentState;
+    if (form!.validate()) {
+      form.save();
+      return true;
+    }
+    return false;
   }
 }
