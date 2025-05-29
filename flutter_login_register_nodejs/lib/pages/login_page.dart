@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:snippet_coder_utils/FormHelper.dart';
 import 'package:snippet_coder_utils/ProgressHUD.dart';
 import 'package:snippet_coder_utils/hex_color.dart';
 
@@ -64,6 +65,80 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ],
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.only(left: 20, bottom: 30, top: 50),
+            child: Text(
+              "Login",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 25,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: FormHelper.inputFieldWidget(
+              context,
+              "Username",
+              "Username",
+              (onValidateVal) {
+                if (onValidateVal.isEmpty) {
+                  return 'Username can\'t be empty.';
+                }
+                return null;
+              },
+              (onSavedVal) {
+                userName = onSavedVal;
+              },
+              prefixIcon: const Icon(Icons.person),
+              initialValue: "",
+              obscureText: false,
+              borderFocusColor: Colors.white,
+              prefixIconColor: Colors.white,
+              borderColor: Colors.white,
+              textColor: Colors.white,
+              hintColor: Colors.white.withOpacity(0.7),
+              borderRadius: 10,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: FormHelper.inputFieldWidget(
+              context,
+              "Password",
+              "Password",
+              (onValidateVal) {
+                if (onValidateVal.isEmpty) {
+                  return 'Password can\'t be empty.';
+                }
+                return null;
+              },
+              (onSavedVal) {
+                password = onSavedVal;
+              },
+              prefixIcon: const Icon(Icons.lock),
+              initialValue: "",
+              obscureText: hidePassword,
+              borderFocusColor: Colors.white,
+              prefixIconColor: Colors.white,
+              borderColor: Colors.white,
+              textColor: Colors.white,
+              hintColor: Colors.white.withOpacity(0.7),
+              borderRadius: 10,
+              suffixIcon: IconButton(
+                onPressed: () {
+                  setState(() {
+                    hidePassword = !hidePassword;
+                  });
+                },
+                color: Colors.white.withOpacity(0.7),
+                icon: Icon(
+                  hidePassword ? Icons.visibility_off : Icons.visibility,
+                ),
+              ),
             ),
           ),
         ],
