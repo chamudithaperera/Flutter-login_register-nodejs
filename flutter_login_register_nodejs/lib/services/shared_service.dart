@@ -22,6 +22,7 @@ class SharedService {
       var cacheData = await APICacheManager().getCacheData("login_details");
       return loginResponseJson(cacheData.syncData);
     }
+    return null;
   }
 
   static Future<void> setLoginDetails(LoginResponseModel model) async {
