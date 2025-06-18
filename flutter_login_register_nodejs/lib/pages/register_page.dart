@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:snippet_coder_utils/FormHelper.dart';
-import 'package:snippet_coder_utils/ProgressHUD.dart';
-import 'package:snippet_coder_utils/hex_color.dart';
+import '../services/api_service.dart';
+import '../config.dart';
+import '../models/register_request_model.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -11,183 +11,216 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  final _formKey = GlobalKey<FormState>();
   bool isApiCallProcess = false;
   bool hidePassword = true;
-  static final GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
+  bool hideConfirmPassword = true;
   String? userName;
   String? password;
   String? email;
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  String? confirmPassword;
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: HexColor("#283B71"),
-        body: ProgressHUD(
-          child: Form(key: globalFormKey, child: _registerUI(context)),
-          inAsyncCall: isApiCallProcess,
-          opacity: 0.3,
-          key: UniqueKey(),
-        ),
-      ),
-    );
-  }
-
-  Widget _registerUI(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height / 5.2,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.white, Colors.white],
-              ),
-              borderRadius: BorderRadius.only(
-                bottomRight: Radius.circular(100),
-                bottomLeft: Radius.circular(100),
-              ),
-            ),
+    return Scaffold(
+      backgroundColor: const Color(0xFFFFF3ED),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Form(
+            key: _formKey,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Align(
-                  alignment: Alignment.center,
-                  child: Image.asset(
-                    "assets/images/ShoppingAppLogo.png",
-                    fit: BoxFit.contain,
-                    width: 250,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 48),
+                const Text(
+                  'Register',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF242424),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 48),
+
+                // Email Field
+                TextFormField(
+                  decoration: InputDecoration(
+                    hintText: 'Email',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.all(16),
+                  ),
+                  validator:
+                      (val) =>
+                          val == null || val.isEmpty
+                              ? "Email can't be empty."
+                              : null,
+                  onSaved: (val) => email = val,
+                ),
+                const SizedBox(height: 16),
+
+                // Password Field
+                TextFormField(
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.all(16),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        hidePassword ? Icons.visibility_off : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          hidePassword = !hidePassword;
+                        });
+                      },
+                    ),
+                  ),
+                  obscureText: hidePassword,
+                  validator:
+                      (val) =>
+                          val == null || val.isEmpty
+                              ? "Password can't be empty."
+                              : null,
+                  onSaved: (val) => password = val,
+                  onChanged: (val) => password = val,
+                ),
+                const SizedBox(height: 16),
+
+                // Confirm Password Field
+                TextFormField(
+                  decoration: InputDecoration(
+                    hintText: 'Confirm Password',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.all(16),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        hideConfirmPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          hideConfirmPassword = !hideConfirmPassword;
+                        });
+                      },
+                    ),
+                  ),
+                  obscureText: hideConfirmPassword,
+                  validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return "Confirm password can't be empty.";
+                    }
+                    if (val != password) {
+                      return "Passwords don't match.";
+                    }
+                    return null;
+                  },
+                  onSaved: (val) => confirmPassword = val,
+                ),
+                const SizedBox(height: 32),
+
+                // Register Button
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF5C00),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: isApiCallProcess ? null : _submit,
+                  child:
+                      isApiCallProcess
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                          : const Text(
+                            'Register',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                ),
+                const SizedBox(height: 16),
+
+                // Login Link
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/login');
+                  },
+                  child: const Text(
+                    'Already have an account? Login',
+                    style: TextStyle(color: Color(0xFF666666)),
                   ),
                 ),
               ],
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.only(left: 20, bottom: 30, top: 50),
-            child: Text(
-              "Register",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 25,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: FormHelper.inputFieldWidget(
-              context,
-              "Username",
-              "Username",
-              (onValidateVal) {
-                if (onValidateVal.isEmpty) {
-                  return 'Username can\'t be empty.';
-                }
-
-                return null;
-              },
-              (onSavedVal) => {userName = onSavedVal},
-              initialValue: "",
-              obscureText: false,
-              borderFocusColor: Colors.white,
-              prefixIconColor: Colors.white,
-              borderColor: Colors.white,
-              textColor: Colors.white,
-              hintColor: Colors.white.withOpacity(0.7),
-              borderRadius: 10,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: FormHelper.inputFieldWidget(
-              context,
-              "Password",
-              "Password",
-              (onValidateVal) {
-                if (onValidateVal.isEmpty) {
-                  return 'Password can\'t be empty.';
-                }
-
-                return null;
-              },
-              (onSavedVal) => {password = onSavedVal},
-              initialValue: "",
-              obscureText: hidePassword,
-              borderFocusColor: Colors.white,
-              prefixIconColor: Colors.white,
-              borderColor: Colors.white,
-              textColor: Colors.white,
-              hintColor: Colors.white.withOpacity(0.7),
-              borderRadius: 10,
-              suffixIcon: IconButton(
-                onPressed: () {
-                  setState(() {
-                    hidePassword = !hidePassword;
-                  });
-                },
-                color: Colors.white.withOpacity(0.7),
-                icon: Icon(
-                  hidePassword ? Icons.visibility_off : Icons.visibility,
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: FormHelper.inputFieldWidget(
-              context,
-              "Email",
-              "Email",
-              (onValidateVal) {
-                if (onValidateVal.isEmpty) {
-                  return 'Email can\'t be empty.';
-                }
-
-                return null;
-              },
-              (onSavedVal) => {email = onSavedVal},
-              initialValue: "",
-              borderFocusColor: Colors.white,
-              prefixIconColor: Colors.white,
-              borderColor: Colors.white,
-              textColor: Colors.white,
-              hintColor: Colors.white.withOpacity(0.7),
-              borderRadius: 10,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Center(
-            child: FormHelper.submitButton(
-              "Register",
-              () {},
-              btnColor: HexColor("283B71"),
-              borderColor: Colors.white,
-              txtColor: Colors.white,
-              borderRadius: 10,
-            ),
-          ),
-          const SizedBox(height: 20),
-        ],
+        ),
       ),
     );
   }
 
-  bool validateAndSave() {
-    final form = globalFormKey.currentState;
-    if (form!.validate()) {
-      form.save();
-      return true;
+  void _submit() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      setState(() => isApiCallProcess = true);
+      final model = RegisterRequestModel(
+        username: userName,
+        password: password,
+        email: email,
+      );
+      APIService.register(model).then((response) {
+        setState(() => isApiCallProcess = false);
+        showDialog(
+          context: context,
+          builder:
+              (context) => AlertDialog(
+                title: const Text(Config.appName),
+                content: Text(response.message),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      if (response.data != null) {
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          '/login',
+                          (route) => false,
+                        );
+                      }
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
+        );
+      });
     }
-    return false;
   }
 }
