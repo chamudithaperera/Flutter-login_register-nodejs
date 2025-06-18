@@ -1,20 +1,21 @@
 import 'dart:convert';
 
-import 'package:flutter_login_register_nodejs/config.dart';
 import 'package:flutter_login_register_nodejs/models/login_request_model.dart';
 import 'package:flutter_login_register_nodejs/models/login_response_model.dart';
 import 'package:flutter_login_register_nodejs/models/register_request_model.dart';
 import 'package:flutter_login_register_nodejs/models/register_response_model.dart';
-import 'package:flutter_login_register_nodejs/services/shared_service.dart';
 import 'package:http/http.dart' as http;
 
-class ApiService {
+import '../../config.dart';
+import 'shared_service.dart';
+
+class APIService {
   static var client = http.Client();
 
   static Future<bool> login(LoginRequestModel model) async {
     Map<String, String> requestHeaders = {'Content-Type': 'application/json'};
 
-    var url = Uri.http(Config.apiUrl + Config.loginApi);
+    var url = Uri.http(Config.apiUrl, Config.loginApi);
 
     var response = await client.post(
       url,
@@ -24,6 +25,7 @@ class ApiService {
 
     if (response.statusCode == 200) {
       await SharedService.setLoginDetails(loginResponseJson(response.body));
+
       return true;
     } else {
       return false;
@@ -35,7 +37,7 @@ class ApiService {
   ) async {
     Map<String, String> requestHeaders = {'Content-Type': 'application/json'};
 
-    var url = Uri.http(Config.apiUrl + Config.registerApi);
+    var url = Uri.http(Config.apiUrl, Config.registerApi);
 
     var response = await client.post(
       url,
@@ -43,6 +45,25 @@ class ApiService {
       body: jsonEncode(model.toJson()),
     );
 
-    return registerResponseModel(response.body);
+    return registerResponseJson(response.body);
+  }
+
+  static Future<String> getUserProfile() async {
+    var loginDetails = await SharedService.loginDetails();
+
+    Map<String, String> requestHeaders = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Basic ${loginDetails!.data.token}',
+    };
+
+    var url = Uri.http(Config.apiUrl, Config.userProfileApi);
+
+    var response = await client.get(url, headers: requestHeaders);
+
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      return "";
+    }
   }
 }

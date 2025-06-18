@@ -4,11 +4,15 @@ import 'package:snippet_coder_utils/FormHelper.dart';
 import 'package:snippet_coder_utils/ProgressHUD.dart';
 import 'package:snippet_coder_utils/hex_color.dart';
 
+import '../services/api_service.dart';
+import '../config.dart';
+import '../models/login_request_model.dart';
+
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key}); // fixed suggestion: use super parameter
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -17,6 +21,11 @@ class _LoginPageState extends State<LoginPage> {
   GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
   String? userName;
   String? password;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +58,8 @@ class _LoginPageState extends State<LoginPage> {
                 colors: [Colors.white, Colors.white],
               ),
               borderRadius: BorderRadius.only(
+                //topLeft: Radius.circular(100),
+                //topRight: Radius.circular(150),
                 bottomRight: Radius.circular(100),
                 bottomLeft: Radius.circular(100),
               ),
@@ -56,6 +67,19 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                // Padding(
+                //   padding: const EdgeInsets.only(top: 20),
+                //   child: Center(
+                //     child: Text(
+                //       "Shopping App",
+                //       style: TextStyle(
+                //         fontWeight: FontWeight.bold,
+                //         fontSize: 40,
+                //         color: HexColor("#283B71"),
+                //       ),
+                //     ),
+                //   ),
+                //),
                 Align(
                   alignment: Alignment.center,
                   child: Image.asset(
@@ -84,17 +108,17 @@ class _LoginPageState extends State<LoginPage> {
               context,
               "Username",
               "Username",
-              (val) {
-                if (val.isEmpty) {
+              (onValidateVal) {
+                if (onValidateVal.isEmpty) {
                   return 'Username can\'t be empty.';
                 }
+
                 return null;
               },
-              (val) => userName = val,
+              (onSavedVal) => {userName = onSavedVal},
               initialValue: "",
               obscureText: false,
               borderFocusColor: Colors.white,
-              prefixIcon: const Icon(Icons.person),
               prefixIconColor: Colors.white,
               borderColor: Colors.white,
               textColor: Colors.white,
@@ -108,17 +132,17 @@ class _LoginPageState extends State<LoginPage> {
               context,
               "Password",
               "Password",
-              (val) {
-                if (val.isEmpty) {
+              (onValidateVal) {
+                if (onValidateVal.isEmpty) {
                   return 'Password can\'t be empty.';
                 }
+
                 return null;
               },
-              (val) => password = val,
+              (onSavedVal) => {password = onSavedVal},
               initialValue: "",
               obscureText: hidePassword,
               borderFocusColor: Colors.white,
-              prefixIcon: const Icon(Icons.lock),
               prefixIconColor: Colors.white,
               borderColor: Colors.white,
               textColor: Colors.white,
@@ -151,11 +175,7 @@ class _LoginPageState extends State<LoginPage> {
                         color: Colors.white,
                         decoration: TextDecoration.underline,
                       ),
-                      recognizer:
-                          TapGestureRecognizer()
-                            ..onTap = () {
-                              // Add your forget password logic here
-                            },
+                      recognizer: TapGestureRecognizer()..onTap = () {},
                     ),
                   ],
                 ),
@@ -168,9 +188,38 @@ class _LoginPageState extends State<LoginPage> {
               "Login",
               () {
                 if (validateAndSave()) {
-                  // Call your login logic here
-                  print("Username: $userName");
-                  print("Password: $password");
+                  setState(() {
+                    isApiCallProcess = true;
+                  });
+
+                  LoginRequestModel model = LoginRequestModel(
+                    username: userName,
+                    password: password,
+                  );
+
+                  APIService.login(model).then((response) {
+                    setState(() {
+                      isApiCallProcess = false;
+                    });
+
+                    if (response) {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        '/home',
+                        (route) => false,
+                      );
+                    } else {
+                      FormHelper.showSimpleAlertDialog(
+                        context,
+                        Config.appName,
+                        "Invalid Username/Password !!",
+                        "OK",
+                        () {
+                          Navigator.of(context).pop();
+                        },
+                      );
+                    }
+                  });
                 }
               },
               btnColor: HexColor("283B71"),
@@ -199,7 +248,7 @@ class _LoginPageState extends State<LoginPage> {
                 text: TextSpan(
                   style: const TextStyle(color: Colors.white, fontSize: 14.0),
                   children: <TextSpan>[
-                    const TextSpan(text: 'Don\'t have an account? '),
+                    const TextSpan(text: 'Dont have an account? '),
                     TextSpan(
                       text: 'Sign up',
                       style: const TextStyle(
@@ -225,7 +274,7 @@ class _LoginPageState extends State<LoginPage> {
 
   bool validateAndSave() {
     final form = globalFormKey.currentState;
-    if (form != null && form.validate()) {
+    if (form!.validate()) {
       form.save();
       return true;
     }

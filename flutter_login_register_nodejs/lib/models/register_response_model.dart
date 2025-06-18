@@ -1,13 +1,12 @@
 import 'dart:convert';
 
-RegisterResponseModel registerResponseModel(String str) =>
+RegisterResponseModel registerResponseJson(String str) =>
     RegisterResponseModel.fromJson(json.decode(str));
 
 class RegisterResponseModel {
+  RegisterResponseModel({required this.message, required this.data});
   late final String message;
   late final Data? data;
-
-  RegisterResponseModel({required this.message, required this.data});
 
   RegisterResponseModel.fromJson(Map<String, dynamic> json) {
     message = json['message'];
@@ -16,24 +15,23 @@ class RegisterResponseModel {
 
   Map<String, dynamic> toJson() {
     final _data = <String, dynamic>{};
-    _data['message'] = this.message;
-    _data['data'] = this.data!.toJson();
+    _data['message'] = message;
+    _data['data'] = data!.toJson();
     return _data;
   }
 }
 
 class Data {
-  late final String username;
-  late final String email;
-  late final String date;
-  late final String id;
-
   Data({
     required this.username,
     required this.email,
     required this.date,
     required this.id,
   });
+  late final String username;
+  late final String email;
+  late final String date;
+  late final String id;
 
   Data.fromJson(Map<String, dynamic> json) {
     username = json['username'];
@@ -44,10 +42,10 @@ class Data {
 
   Map<String, dynamic> toJson() {
     final _data = <String, dynamic>{};
-    _data['username'] = this.username;
-    _data['email'] = this.email;
-    _data['date'] = this.date;
-    _data['id'] = this.id;
+    _data['username'] = username;
+    _data['email'] = email;
+    _data['date'] = date;
+    _data['id'] = id;
     return _data;
   }
 }
