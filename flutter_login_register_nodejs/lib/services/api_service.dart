@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter_login_register_nodejs/config.dart';
 import 'package:flutter_login_register_nodejs/models/login_request_model.dart';
+import 'package:flutter_login_register_nodejs/models/login_response_model.dart';
 import 'package:flutter_login_register_nodejs/models/register_request_model.dart';
 import 'package:flutter_login_register_nodejs/models/register_response_model.dart';
+import 'package:flutter_login_register_nodejs/services/shared_service.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -21,6 +23,7 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
+      await SharedService.setLoginDetails(loginResponseJson(response.body));
       return true;
     } else {
       return false;
